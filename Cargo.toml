@@ -12,6 +12,22 @@ repository = "https://github.com/TimeTravelPenguin/chatapp"
 [workspace.lints.rust]
 # missing_docs = "warn"
 
+[workspace.dependencies]
+tokio = "1.52.3"
+time = { version = "0.3.49", features = ["serde", "formatting"] }
+uuid = { version = "1.23.3", features = ["v4", "serde"] }
+sea-orm = { version = "~2.0.0-rc", features = [
+  "sqlx-sqlite",
+  "runtime-tokio-rustls",
+  "macros",
+  "with-time",
+  "with-uuid",
+] }
+sea-orm-migration = { version = "~2.0.0-rc", features = [
+  "runtime-tokio-rustls",
+  "sqlx-sqlite",
+] }
+
 [profile.dev]
 opt-level = 1
 

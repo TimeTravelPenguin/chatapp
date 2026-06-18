@@ -7,26 +7,11 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
-sea-orm = { version = "~2.0.0-rc", features = [
-  "sqlx-sqlite",
-  "runtime-tokio-rustls",
-  "macros",
-  "with-time",
-  "with-uuid",
-] }
-time = { version = "0.3.47", features = ["serde", "formatting"] }
-uuid = { version = "1.23.3", features = ["v4", "serde"] }
-
-[dependencies.sea-orm-migration]
-features = [
-  # Enable at least one `ASYNC_RUNTIME` and `DATABASE_DRIVER` feature if you want to run migration via CLI.
-  # View the list of supported features at https://www.sea-ql.org/SeaORM/docs/install-and-config/database-and-async-runtime.
-  # e.g.
-  "runtime-tokio-rustls", # `ASYNC_RUNTIME` feature
-  "sqlx-sqlite",          # `DATABASE_DRIVER` feature
-]
-version = "~2.0.0-rc"
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
+sea-orm.workspace = true
+sea-orm-migration.workspace = true
+time.workspace = true
+uuid.workspace = true
 
 [lints]
 workspace = true

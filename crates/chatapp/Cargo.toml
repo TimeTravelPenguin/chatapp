@@ -20,20 +20,12 @@ futures-util = "0.3.32"
 http = "1.4.2"
 iced = "0.14.0"
 rolling-file = "0.2.0"
-sea-orm = { version = "~2.0.0-rc", features = [
-  "sqlx-sqlite",
-  "runtime-tokio-rustls",
-  "macros",
-  "with-time",
-  "with-uuid",
-  "schema-sync",
-  "entity-registry",
-] }
+sea-orm = { workspace = true, features = ["schema-sync", "entity-registry"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
 thiserror = "2.0.18"
-time = { version = "0.3.49", features = ["formatting", "parsing", "serde"] }
-tokio = { version = "1.52.3", features = ["full"] }
+time = { workspace = true, features = ["parsing"] }
+tokio = { workspace = true, features = ["full"] }
 tokio-rustls = { version = "0.26.4", features = ["logging"] }
 tokio-util = { version = "0.7.18", features = ["codec"] }
 tracing = "0.1.44"
@@ -45,7 +37,7 @@ tracing-subscriber = { version = "0.3.23", features = [
   "registry",
   "std",
 ] }
-uuid = { version = "1.23.3", features = ["v4", "serde"] }
+uuid.workspace = true
 
 [dev-dependencies]
 pretty_assertions = "1.4.1"
