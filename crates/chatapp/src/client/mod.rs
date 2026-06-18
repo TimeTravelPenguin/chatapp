@@ -22,6 +22,7 @@ pub async fn run_client(server: Authority) -> Result<(), ClientError> {
         ClientApp::update,
         ClientApp::view,
     )
+    .subscription(ClientApp::subscription)
     .theme(|app: &ClientApp| app.theme.clone())
     .run()?;
 

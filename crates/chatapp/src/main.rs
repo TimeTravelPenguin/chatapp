@@ -1,5 +1,6 @@
 use clap_verbosity_flag::Verbosity;
 use rolling_file::{BasicRollingFileAppender, RollingConditionBasic};
+use tracing::info;
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::{filter::EnvFilter, prelude::*};
 
@@ -12,6 +13,7 @@ async fn main() {
     match cli.command {
         cli::Commands::Server { address, cert, key } => {
             let _log_guard = configure_logging(cli.verbosity, LogMode::Server);
+            info!("Starting server");
 
             chatapp::server::run_server(&address, cert, key)
                 .await
@@ -19,6 +21,7 @@ async fn main() {
         }
         cli::Commands::Client { server } => {
             let _log_guard = configure_logging(cli.verbosity, LogMode::Client);
+            info!("Starting client");
 
             chatapp::client::run_client(server)
                 .await
