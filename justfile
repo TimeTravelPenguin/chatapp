@@ -3,3 +3,10 @@ install:
 
 gen-certs:
     rustls-cert-gen --output certs/ --san localhost
+
+server:
+  rm -f server.db
+  cargo run server
+
+client:
+   cargo run client
