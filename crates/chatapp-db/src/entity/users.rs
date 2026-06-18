@@ -10,7 +10,7 @@ pub struct Model {
     pub id: Uuid,
 
     #[sea_orm(unique)]
-    pub user_name: String,
+    pub username: String,
     #[sea_orm(unique)]
     pub email: String,
 

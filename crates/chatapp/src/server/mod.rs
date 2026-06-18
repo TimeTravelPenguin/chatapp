@@ -1,10 +1,7 @@
 use std::{net::ToSocketAddrs, path::PathBuf, sync::Arc};
 
 use thiserror::Error;
-use tokio::{
-    io::{AsyncWriteExt, copy, split},
-    net::TcpListener,
-};
+use tokio::net::TcpListener;
 use tokio_rustls::{
     TlsAcceptor,
     rustls::{
@@ -17,9 +14,13 @@ use tokio_rustls::{
         version,
     },
 };
+use tracing::{error, info};
 
-use crate::server::store::DbStore;
+use crate::server::{connection::handle_client, store::DbStore};
 
+pub mod connection;
+pub mod models;
+pub mod password;
 pub mod store;
 
 #[derive(Debug, Error)]
@@ -38,6 +39,9 @@ pub enum ServerError {
 
     #[error("invalid server address: {0}")]
     InvalidAddress(String),
+
+    #[error("client connection error: {0}")]
+    ConnectionError(#[from] connection::ConnectionError),
 }
 
 pub struct Server {
@@ -71,43 +75,33 @@ impl Server {
     }
 
     pub async fn run(self) -> Result<(), ServerError> {
-        println!("Server listening on {}", self.listener.local_addr()?);
+        info!("Server listening on {}", self.listener.local_addr()?);
 
         loop {
             let (stream, peer_addr) = self.listener.accept().await?;
             let acceptor = self.acceptor.clone();
-            let _store = self.store.clone();
-
-            // TEMP: Echo
-            let fut = async move {
-                let stream = acceptor.accept(stream).await?;
-
-                let (mut reader, mut writer) = split(stream);
-                let n = copy(&mut reader, &mut writer).await?;
-                writer.flush().await?;
-                println!("Echo: {} - {}", peer_addr, n);
-
-                Ok(()) as std::io::Result<()>
-            };
+            let store = self.store.clone();
 
             tokio::spawn(async move {
-                match fut.await {
-                    Ok(_) => println!("Connection with {peer_addr} closed"),
-                    Err(err) => eprintln!("{:?}", err),
+                let result = async move {
+                    let stream = acceptor.accept(stream).await?;
+                    info!(%peer_addr, "accepted TLS connection");
+
+                    handle_client(stream, store).await?;
+
+                    Ok::<(), ServerError>(())
+                }
+                .await;
+
+                match result {
+                    Ok(()) => {
+                        info!(%peer_addr, "connection closed");
+                    }
+                    Err(error) => {
+                        error!(%peer_addr, %error, "connection failed");
+                    }
                 }
             });
-
-            // tokio::spawn(async move {
-            //     match acceptor.accept(stream).await {
-            //         Ok(stream) => {
-            //             println!("Accepted TLS connection from {peer_addr}");
-            //             // handle_client(stream, store).await
-            //         }
-            //         Err(error) => {
-            //             eprintln!("TLS accept error from {peer_addr}: {error}");
-            //         }
-            //     }
-            // });
         }
     }
 }

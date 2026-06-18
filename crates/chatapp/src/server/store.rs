@@ -6,10 +6,8 @@ use chatapp_db::{
 };
 use sea_orm::{ActiveModelTrait, ActiveValue, Database, DatabaseConnection};
 use thiserror::Error;
-use time::OffsetDateTime;
-use uuid::Uuid;
 
-use crate::hasher;
+use crate::server::models::user::NewUser;
 
 #[derive(Debug, Error)]
 pub enum StoreError {
@@ -34,24 +32,30 @@ impl DbStore {
 
         if !pending.is_empty() {
             Migrator::up(&store.db, None).await?;
-            store.create_demo_user().await?; // TEMP
+
+            // TEMP
+            let user = NewUser::new(
+                "TimeTravelPenguin",
+                "Phillip Smith",
+                "TimeTravelPenguin@gmail.com",
+                "penguins",
+            )
+            .unwrap();
+            store.create_user(user).await?;
         }
 
         Ok(store)
     }
 
-    pub async fn create_demo_user(&self) -> Result<(), StoreError> {
-        let now = OffsetDateTime::now_utc();
-        let hash = hasher::hash_password("penguins").expect("Failed to hash password");
-
+    pub async fn create_user(&self, user: NewUser) -> Result<(), StoreError> {
         let user = UserActiveModel {
-            id: ActiveValue::Set(Uuid::new_v4()),
-            user_name: ActiveValue::Set("timetravelpenguin".to_string()),
-            display_name: ActiveValue::Set("TimeTravelPenguin".to_string()),
-            email: ActiveValue::Set("timetravelpenguin@gmail.com".to_string()),
-            password_hash: ActiveValue::Set(hash.into_string()),
-            created_at: ActiveValue::Set(now),
-            updated_at: ActiveValue::Set(now),
+            id: ActiveValue::Set(user.id),
+            username: ActiveValue::Set(user.username),
+            display_name: ActiveValue::Set(user.display_name),
+            email: ActiveValue::Set(user.email),
+            password_hash: ActiveValue::Set(user.password_hash.to_string()),
+            created_at: ActiveValue::Set(user.created_at),
+            updated_at: ActiveValue::Set(user.created_at),
         };
 
         user.insert(&self.db).await?;
