@@ -49,7 +49,7 @@ impl DbStore {
             user_name: ActiveValue::Set("timetravelpenguin".to_string()),
             display_name: ActiveValue::Set("TimeTravelPenguin".to_string()),
             email: ActiveValue::Set("timetravelpenguin@gmail.com".to_string()),
-            password_hash: ActiveValue::Set(hash.to_string()),
+            password_hash: ActiveValue::Set(hash.into_string()),
             created_at: ActiveValue::Set(now),
             updated_at: ActiveValue::Set(now),
         };
