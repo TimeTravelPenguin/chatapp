@@ -1,4 +1,4 @@
-use clap_verbosity_flag::Verbosity;
+use clap_verbosity_flag::{LogLevel, Verbosity};
 use rolling_file::{BasicRollingFileAppender, RollingConditionBasic};
 use tracing::info;
 use tracing_appender::non_blocking::WorkerGuard;
@@ -36,7 +36,7 @@ enum LogMode {
     Server,
 }
 
-fn configure_logging(verbosity: Verbosity, mode: LogMode) -> WorkerGuard {
+fn configure_logging<L: LogLevel>(verbosity: Verbosity<L>, mode: LogMode) -> WorkerGuard {
     const GIB: u64 = 1024 * 1024 * 1024;
 
     std::fs::create_dir_all("./logs").expect("failed to create log directory");

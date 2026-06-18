@@ -1,13 +1,13 @@
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
-use clap_verbosity_flag::Verbosity;
+use clap_verbosity_flag::{InfoLevel, Verbosity};
 use http::uri::Authority;
 
 #[derive(Debug, Parser)]
 pub struct Cli {
     #[clap(flatten)]
-    pub verbosity: Verbosity,
+    pub verbosity: Verbosity<InfoLevel>,
 
     #[clap(subcommand)]
     pub command: Commands,
